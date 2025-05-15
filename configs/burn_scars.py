@@ -12,7 +12,7 @@ cudnn_benchmark = True
 dataset_type = "GeospatialDataset"
 
 # TO BE DEFINED BY USER: data directory
-data_root = r"C:/Users/yanni/python_workplace/MyGeoMonitor/data_split"
+data_root = "/kaggle/input/data_splits"
 
 num_frames = 1
 img_size = (352,176)
@@ -62,8 +62,8 @@ max_intervals = 10000
 evaluation_interval = 1000
 
 # TO BE DEFINED BY USER: model path
-experiment = r"C:/Users/yanni/python_workplace/MyGeoMonitor/experiments/burn_scars"
-project_dir = r"C:/Users/yanni/python_workplace/MyGeoMonitor"
+experiment = "experiments/burn_scars"
+project_dir = "/kaggle/working"
 work_dir = os.path.join(project_dir, experiment)
 save_path = work_dir
 
