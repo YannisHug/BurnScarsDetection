@@ -12,10 +12,10 @@ cudnn_benchmark = True
 dataset_type = "GeospatialDataset"
 
 # TO BE DEFINED BY USER: data directory
-data_root = "<path to data root directory>"
+data_root = r"C:/Users/yanni/python_workplace/MyGeoMonitor/data_split"
 
 num_frames = 1
-img_size = 224
+img_size = (352,176)
 num_workers = 4
 samples_per_gpu = 4
 
@@ -39,9 +39,9 @@ img_norm_cfg = dict(
 )  # change the mean and std of all the bands
 
 bands = [0, 1, 2, 3, 4, 5]
-tile_size = 224
-orig_nsize = 512
-crop_size = (tile_size, tile_size)
+tile_size = (352,176)
+orig_nsize = (352,176)
+crop_size = (352,176)
 img_suffix = "_merged.tif"
 seg_map_suffix = ".mask.tif"
 ignore_index = -1
@@ -51,7 +51,7 @@ image_to_float32 = True
 
 # model
 # TO BE DEFINED BY USER: model path
-pretrained_weights_path = "<path to pretrained weights>"
+pretrained_weights_path = None
 num_layers = 12
 patch_size = 16
 embed_dim = 768
@@ -62,8 +62,8 @@ max_intervals = 10000
 evaluation_interval = 1000
 
 # TO BE DEFINED BY USER: model path
-experiment = "<experiment name>"
-project_dir = "<project directory name>"
+experiment = r"C:/Users/yanni/python_workplace/MyGeoMonitor/experiments/burn_scars"
+project_dir = r"C:/Users/yanni/python_workplace/MyGeoMonitor"
 work_dir = os.path.join(project_dir, experiment)
 save_path = work_dir
 
@@ -77,13 +77,13 @@ train_pipeline = [
     # to channels first
     dict(type="TorchPermute", keys=["img"], order=(2, 0, 1)),
     dict(type="TorchNormalize", **img_norm_cfg),
-    dict(type="TorchRandomCrop", crop_size=(tile_size, tile_size)),
+    dict(type="TorchRandomCrop", crop_size=crop_size),
     dict(
         type="Reshape",
         keys=["img"],
-        new_shape=(len(bands), num_frames, tile_size, tile_size),
+        new_shape=(len(bands), num_frames, tile_size[0], tile_size[1]),
     ),
-    dict(type="Reshape", keys=["gt_semantic_seg"], new_shape=(1, tile_size, tile_size)),
+    dict(type="Reshape", keys=["gt_semantic_seg"], new_shape=(1, tile_size[0], tile_size[1])),
     dict(type="CastTensor", keys=["gt_semantic_seg"], new_type="torch.LongTensor"),
     dict(type="Collect", keys=["img", "gt_semantic_seg"]),
 ]
@@ -215,8 +215,8 @@ model = dict(
         embed_dim=embed_dim * num_frames,
         output_embed_dim=output_embed_dim,
         drop_cls_token=True,
-        Hp=14,
-        Wp=14,
+        Hp=11,
+        Wp=22,
     ),
     decode_head=dict(
         num_classes=len(CLASSES),
@@ -247,8 +247,8 @@ model = dict(
     train_cfg=dict(),
     test_cfg=dict(
         mode="slide",
-        stride=(int(tile_size / 2), int(tile_size / 2)),
-        crop_size=(tile_size, tile_size),
+        stride=(int(tile_size[0] / 2), int(tile_size[1] / 2)),
+        crop_size=crop_size,
     ),
 )
 auto_resume = False
